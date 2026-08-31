@@ -8,7 +8,8 @@ const testOutput = new URL('../.test-dist', import.meta.url);
 const compiledTests = new URL('../.test-dist/test', import.meta.url);
 
 await rm(testOutput, { recursive: true, force: true });
-await run(process.platform === 'win32' ? 'tsc.cmd' : 'tsc', ['-p', 'tsconfig.test.json']);
+const typeScriptCompiler = fileURLToPath(new URL('../node_modules/typescript/bin/tsc', import.meta.url));
+await run(process.execPath, [typeScriptCompiler, '-p', 'tsconfig.test.json']);
 
 const testFiles = (await readdir(compiledTests))
   .filter((fileName) => fileName.endsWith('.test.js'))
