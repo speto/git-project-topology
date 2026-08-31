@@ -104,9 +104,10 @@ describe('inspectProjectTopology', () => {
     const fixture = await createRegularRepository();
     git(['-C', fixture.repository, 'worktree', 'lock', '--reason', 'portable volume', fixture.linkedWorktree]);
 
+    const linkedWorktreeCanonicalPath = await canonical(fixture.linkedWorktree);
     let topology = await inspectProjectTopology(fixture.repository);
     let linked = topology.git?.worktrees.find(
-      (worktree) => worktree.path.canonicalPath === path.resolve(fixture.linkedWorktree),
+      (worktree) => worktree.path.canonicalPath === linkedWorktreeCanonicalPath,
     );
     assert.equal(linked?.locked, true);
     assert.equal(linked?.lockReason, 'portable volume');
@@ -115,7 +116,7 @@ describe('inspectProjectTopology', () => {
     await rm(fixture.linkedWorktree, { recursive: true, force: true });
     topology = await inspectProjectTopology(fixture.repository);
     linked = topology.git?.worktrees.find(
-      (worktree) => worktree.path.canonicalPath === path.resolve(fixture.linkedWorktree),
+      (worktree) => worktree.path.canonicalPath === linkedWorktreeCanonicalPath,
     );
     assert.equal(linked?.locked, true);
     assert.equal(linked?.availability, 'missing');
