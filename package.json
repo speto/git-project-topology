@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/speto/git-project-topology#readme",
   "devDependencies": {
-    "@types/node": "^22.20.1",
-    "typescript": "^7.0.2"
+    "@types/node": "22.20.1",
+    "typescript": "7.0.2"
   }
 }
