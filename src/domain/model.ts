@@ -3,7 +3,7 @@ export interface TopologyPath {
   readonly displayPath: string;
 }
 
-export interface SelectedPath extends TopologyPath {
+export interface PathIdentity extends TopologyPath {
   readonly inputPath: string;
   readonly absolutePath: string;
 }
@@ -38,7 +38,7 @@ export type ProjectSelectionKind =
   | 'project-descendant';
 
 export interface ProjectSelection {
-  readonly path: SelectedPath;
+  readonly path: PathIdentity;
   readonly kind: ProjectSelectionKind;
   readonly worktreeCanonicalPath: string | null;
 }
