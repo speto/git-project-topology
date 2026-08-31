@@ -11,7 +11,7 @@ export type {
   ProjectSelection,
   ProjectSelectionKind,
   ProjectTopology,
-  SelectedPath,
+  PathIdentity,
   TopologyPath,
   WorktreeAvailability,
 } from './domain/model.js';
@@ -30,7 +30,7 @@ export interface InspectProjectTopologyOptions {
 export async function resolvePathIdentity(
   inputPath: string,
   options: PathIdentityOptions = {},
-): Promise<import('./domain/model.js').SelectedPath> {
+): Promise<import('./domain/model.js').PathIdentity> {
   const paths = new NodePathTopologySource(
     options.cwd === undefined ? {} : { cwd: options.cwd },
   );
