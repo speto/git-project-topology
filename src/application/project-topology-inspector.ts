@@ -6,7 +6,7 @@ import type {
   GitWorktreeTopology,
   ProjectSelection,
   ProjectTopology,
-  SelectedPath,
+  PathIdentity,
   TopologyPath,
 } from '../domain/model.js';
 
@@ -109,7 +109,7 @@ export class ProjectTopologyInspector {
   async #toWorktreeTopology(
     worktree: ResolvedRawWorktree,
     projectRoot: TopologyPath,
-    selectedPath: SelectedPath,
+    selectedPath: PathIdentity,
   ): Promise<GitWorktreeTopology> {
     const displayPath = displayPathForTopologyPath(
       worktree.path,
@@ -150,7 +150,7 @@ function deriveProjectRoot(commonDirectoryPath: string): string {
 function displayPathForTopologyPath(
   canonicalPath: string,
   projectRoot: TopologyPath,
-  selectedPath: SelectedPath,
+  selectedPath: PathIdentity,
   paths: PathTopologySource,
 ): string {
   if (isPathWithin(projectRoot.canonicalPath, canonicalPath)) {
@@ -164,7 +164,7 @@ function displayPathForTopologyPath(
 }
 
 function resolveSelection(
-  selectedPath: SelectedPath,
+  selectedPath: PathIdentity,
   projectRoot: TopologyPath,
   commonDirectory: TopologyPath,
   worktrees: readonly GitWorktreeTopology[],
