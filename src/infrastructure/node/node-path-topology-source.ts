@@ -7,7 +7,7 @@ import type {
 } from '../../application/ports.js';
 import { ProjectTopologyError } from '../../domain/errors.js';
 import { isPathWithin } from '../../domain/path-containment.js';
-import type { SelectedPath, TopologyPath, WorktreeAvailability } from '../../domain/model.js';
+import type { PathIdentity, TopologyPath, WorktreeAvailability } from '../../domain/model.js';
 
 export interface NodePathTopologySourceOptions {
   readonly cwd?: string;
@@ -23,11 +23,11 @@ export class NodePathTopologySource implements PathTopologySource {
     this.#homeDirectory = path.resolve(options.homeDirectory ?? homedir());
   }
 
-  async resolveInput(inputPath: string): Promise<SelectedPath> {
+  async resolveInput(inputPath: string): Promise<PathIdentity> {
     return this.resolvePathIdentity(inputPath, false);
   }
 
-  async resolvePathIdentity(inputPath: string, allowMissing: boolean): Promise<SelectedPath> {
+  async resolvePathIdentity(inputPath: string, allowMissing: boolean): Promise<PathIdentity> {
     if (inputPath.length === 0) {
       throw new ProjectTopologyError('INVALID_INPUT', 'Project path cannot be empty.');
     }
@@ -92,7 +92,7 @@ export class NodePathTopologySource implements PathTopologySource {
     }
   }
 
-  deriveDisplayPath(targetCanonicalPath: string, selectedPath: SelectedPath): string {
+  deriveDisplayPath(targetCanonicalPath: string, selectedPath: PathIdentity): string {
     if (isPathWithin(targetCanonicalPath, selectedPath.canonicalPath)) {
       const relativePath = path.relative(targetCanonicalPath, selectedPath.canonicalPath);
       return ascendPath(selectedPath.displayPath, relativePath);
