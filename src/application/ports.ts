@@ -1,4 +1,4 @@
-import type { SelectedPath, TopologyPath, WorktreeAvailability } from '../domain/model.js';
+import type { PathIdentity, TopologyPath, WorktreeAvailability } from '../domain/model.js';
 
 export interface RawGitWorktree {
   readonly path: string;
@@ -25,10 +25,10 @@ export interface GitTopologySource {
 export type FileSystemEntryKind = 'directory' | 'file';
 
 export interface PathTopologySource {
-  resolveInput(inputPath: string): Promise<SelectedPath>;
+  resolveInput(inputPath: string): Promise<PathIdentity>;
   resolveExisting(path: string, displayPath?: string): Promise<TopologyPath>;
   resolvePossiblyMissing(path: string, displayPath?: string): Promise<TopologyPath>;
   entryKind(path: string): Promise<FileSystemEntryKind>;
   availability(path: string): Promise<WorktreeAvailability>;
-  deriveDisplayPath(targetCanonicalPath: string, selectedPath: SelectedPath): string;
+  deriveDisplayPath(targetCanonicalPath: string, selectedPath: PathIdentity): string;
 }
