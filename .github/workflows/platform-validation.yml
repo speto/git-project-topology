@@ -1,8 +1,8 @@
-name: CI
+name: Platform validation
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
+    types: [ready_for_review]
     paths:
       - 'src/**'
       - 'test/**'
@@ -11,7 +11,6 @@ on:
       - 'tsconfig.json'
       - 'tsconfig.build.json'
       - 'tsconfig.test.json'
-      - '.github/workflows/ci.yml'
       - '.github/workflows/platform-validation.yml'
   workflow_dispatch:
 
@@ -24,15 +23,22 @@ permissions:
 
 jobs:
   check:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false }}
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: 22
+          - os: macos-latest
+            node: 24
+          - os: windows-latest
+            node: 24
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: ${{ matrix.node }}
           package-manager-cache: false
       - run: npm install --no-audit --no-fund
       - run: npm run check
-      - run: npm pack --dry-run --ignore-scripts
