@@ -1,33 +1,73 @@
-name: PR Check
+name: CI
 
 on:
   pull_request:
     branches: [main]
-    types: [opened, reopened, synchronize, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
       - '**/*.md'
-  push:
-    branches: [main]
-    paths-ignore:
-      - '**/*.md'
+      - LICENSE
 
 permissions:
   contents: read
 
 concurrency:
-  group: pr-check-${{ github.event.pull_request.number || github.ref }}
+  group: git-project-topology-pr-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
-  check:
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    runs-on: ubuntu-slim
+  validate:
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
           package-manager-cache: false
-      - run: npm install --ignore-scripts --no-audit --no-fund
-      - run: npm run check
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
+      - name: Check
+        run: npm run check
+      - name: Verify package
+        run: npm run verify:package
+      - name: Verify release tag guard
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          npm run verify:release-tag -- "v${version}"
+          if npm run verify:release-tag -- "v${version}-mismatch"; then
+            echo 'Expected mismatched release tag validation to fail.' >&2
+            exit 1
+          fi
+
+  compatibility:
+    if: ${{ github.event.pull_request.draft == false }}
+    name: Compatibility (${{ matrix.os }}, Node ${{ matrix.node }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: 22
+          - os: macos-latest
+            node: 24
+          - os: windows-latest
+            node: 24
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
+      - name: Test Git/filesystem compatibility
+        run: npm test
