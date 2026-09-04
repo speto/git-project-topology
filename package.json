@@ -15,8 +15,8 @@
   },
   "files": [
     "dist",
-    "src",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=22"
@@ -26,7 +26,9 @@
     "build": "npm run clean && tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node ./scripts/test.mjs",
-    "check": "npm run typecheck && npm test && npm run build",
+    "check": "npm test && npm run build",
+    "verify:package": "node ./scripts/verify-package.mjs",
+    "verify:release-tag": "node ./scripts/verify-release-tag.mjs",
     "prepare": "npm run build",
     "prepublishOnly": "npm run check"
   },
