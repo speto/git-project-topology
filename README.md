@@ -20,9 +20,23 @@ These all resolve to the same project:
 
 ## Install
 
+Use the prebuilt npm-compatible tarball attached to the GitHub Release:
+
 ```sh
-npm install github:speto/git-project-topology
+npm install https://github.com/speto/git-project-topology/releases/download/v0.1.0/git-project-topology-0.1.0.tgz
 ```
+
+Or in `package.json`:
+
+```json
+{
+  "dependencies": {
+    "git-project-topology": "https://github.com/speto/git-project-topology/releases/download/v0.1.0/git-project-topology-0.1.0.tgz"
+  }
+}
+```
+
+The release asset is produced by `npm pack` and already contains the compiled library. Do not use GitHub's source archive as the package dependency.
 
 Node.js 22+ and Git 2.36+.
 
@@ -124,6 +138,18 @@ INVALID_GIT_TOPOLOGY
 ## Development
 
 ```sh
-npm install
+npm ci
 npm run check
+npm run verify:package
 ```
+
+## Release
+
+1. Update the version in `package.json` and regenerate `package-lock.json` if dependency metadata changed.
+2. Run `npm ci` and `npm run check`.
+3. Run `npm pack --dry-run --ignore-scripts` and inspect the package contents.
+4. Commit the release changes.
+5. Create and push the matching `vX.Y.Z` tag.
+6. GitHub Actions verifies the tag, builds and checks the package, validates a clean consumer install, then creates the GitHub Release and attaches `git-project-topology-X.Y.Z.tgz`.
+
+The package is not published to the npm registry.
